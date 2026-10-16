@@ -128,6 +128,7 @@ static const Key keys[] = {
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,      spawn,            TERMFLOATCMD },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_d,           spawn,            MENUCMD },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_s,           spawn,            SCREENSHOTCMD },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_q,           killclient,       {0} },
 	{ MODKEY,                    XKB_KEY_j,           focusstack,       {.i = +1} },
 	{ MODKEY,                    XKB_KEY_k,           focusstack,       {.i = -1} },
 	{ MODKEY,                    XKB_KEY_i,           incnmaster,       {.i = +1} },
@@ -152,7 +153,6 @@ static const Key keys[] = {
 	TAGKEYS(                     XKB_KEY_8,           7),
 	TAGKEYS(                     XKB_KEY_9,           8),
 	TAGKEYS(                     XKB_KEY_0,           9),
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_q,           quit,             {0} },
 
 	/* Ctrl-Alt-Backspace and Ctrl-Alt-Fx used to be handled by X server */
 	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_BackSpace, quit, {0} },
