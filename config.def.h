@@ -25,6 +25,12 @@ static const float animation_curve[4] = {0.0f, 0.85f, 0.2f, 1.0f}; /* cubic-bezi
 /* logging */
 static int log_level = WLR_ERROR;
 
+/* Autostart */
+static const char *const autostart[] = {
+        "sh", "-c", "swaybg -m fill -i ~/.config/background", NULL,
+        NULL /* terminate */
+};
+
 static const Rule rules[] = {
 	/* app_id   title  tags mask  isfloating   monitor */
 	{ NULL,     NULL,  0,         0,           -1 },
