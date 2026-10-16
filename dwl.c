@@ -86,6 +86,7 @@
 #define LISTEN_STATIC(E, H)     do { struct wl_listener *_l = ecalloc(1, sizeof(*_l)); _l->notify = (H); wl_signal_add((E), _l); } while (0)
 
 /* enums */
+enum { CliNormal, CliClosing, CliOpening }; /* client events */
 enum { CurNormal, CurPressed, CurMove, CurResize }; /* cursor */
 enum { XDGShell, LayerShell, X11 }; /* client types */
 enum { LyrBg, LyrBottom, LyrTile, LyrFloat, LyrTop, LyrFS, LyrUnmanaged, LyrOverlay,
@@ -159,6 +160,11 @@ typedef struct {
 	unsigned int bw;
 	uint32_t tags;
 	int isfloating, isurgent, isfullscreen;
+
+	/* Animation */
+	struct wlr_box anim_from, anim_to, anim_cur;
+	uint32_t anim_start, serial;
+	int animating, status;
 } Client;
 
 typedef struct {
@@ -261,6 +267,10 @@ typedef struct {
 } SessionLock;
 
 /* function declarations */
+static uint32_t animation_now_ms(void);
+static float animation_bezier(float t);
+static int animation_tick(void *data);
+static void animation_apply(Client *c, struct wlr_box g);
 static void applybounds(Client *c, struct wlr_box *bbox);
 static void applyrules(Client *c);
 static void arrange(Monitor *m);
@@ -376,6 +386,7 @@ static void xytonode(double x, double y, struct wlr_surface **psurface,
 static void zoom(const Arg *arg);
 
 /* variables */
+static struct wl_event_source *animation_timer;
 static pid_t child_pid = -1;
 static int locked;
 static Client *focused_client;
@@ -486,6 +497,86 @@ static struct wlr_xwayland *xwayland;
 #include "ime.h"
 
 /* function implementations */
+uint32_t
+animation_now_ms(void)
+{
+	struct timespec t;
+
+	clock_gettime(CLOCK_MONOTONIC, &t);
+	return t.tv_sec * 1000 + t.tv_nsec / 1000000;
+}
+
+float
+animation_bezier(float t)
+{
+	float x1 = animation_curve[0], y1 = animation_curve[1];
+	float x2 = animation_curve[2], y2 = animation_curve[3];
+	float lo = 0, hi = 1, s = t, x;
+	int i;
+
+	for (i = 0; i < 20; i++) {
+		x = 3*(1-s)*(1-s)*s*x1 + 3*(1-s)*s*s*x2 + s*s*s;
+		if (x < t)
+			lo = s;
+		else
+			hi = s;
+		s = (lo + hi) / 2;
+	}
+	return 3*(1-s)*(1-s)*s*y1 + 3*(1-s)*s*s*y2 + s*s*s;
+}
+
+int
+animation_tick(void *data)
+{
+	Client *c;
+	float t, p;
+	int more = 0;
+
+	wl_list_for_each(c, &clients, link) {
+		if (!c->animating)
+			continue;
+		t = (animation_now_ms() - c->anim_start) / (float)animation_duration;
+		if (t >= 1) {
+			t = 1;
+			c->animating = 0;
+		}
+		p = animation_bezier(t);
+		c->anim_cur.x      = (int)(c->anim_from.x      + (c->anim_to.x      - c->anim_from.x)      * p);
+		c->anim_cur.y      = (int)(c->anim_from.y      + (c->anim_to.y      - c->anim_from.y)      * p);
+		c->anim_cur.width  = (int)(c->anim_from.width  + (c->anim_to.width  - c->anim_from.width)  * p);
+		c->anim_cur.height = (int)(c->anim_from.height + (c->anim_to.height - c->anim_from.height) * p);
+
+		animation_apply(c, c->anim_cur);
+		more |= c->animating;
+	}
+	if (more)
+		wl_event_source_timer_update(animation_timer, 16);
+	return 0;
+}
+
+void
+animation_apply(Client *c, struct wlr_box g)
+{
+	struct wlr_box clip, save = c->geom;
+
+	c->geom = g;
+
+	wlr_scene_node_set_position(&c->scene->node, c->geom.x, c->geom.y);
+	wlr_scene_node_set_position(&c->scene_surface->node, c->bw, c->bw);
+	wlr_scene_rect_set_size(c->border[0], c->geom.width, c->bw);
+	wlr_scene_rect_set_size(c->border[1], c->geom.width, c->bw);
+	wlr_scene_rect_set_size(c->border[2], c->bw, c->geom.height - 2 * c->bw);
+	wlr_scene_rect_set_size(c->border[3], c->bw, c->geom.height - 2 * c->bw);
+	wlr_scene_node_set_position(&c->border[1]->node, 0, c->geom.height - c->bw);
+	wlr_scene_node_set_position(&c->border[2]->node, 0, c->bw);
+	wlr_scene_node_set_position(&c->border[3]->node, c->geom.width - c->bw, c->bw);
+
+	client_get_clip(c, &clip);
+	wlr_scene_subsurface_tree_set_clip(&c->scene_surface->node, &clip);
+
+	c->geom = save;
+}
+
 void
 applybounds(Client *c, struct wlr_box *bbox)
 {
@@ -1887,6 +1978,7 @@ mapnotify(struct wl_listener *listener, void *data)
 		.title = client_get_title(c),
 	};
 
+	c->status = CliOpening;
 	/* Create scene tree for this client and its border */
 	c->scene = client_surface(c)->data = wlr_scene_tree_create(layers[LyrTile]);
 	/* Enabled later by a call to arrange() */
@@ -2340,12 +2432,17 @@ rendermon(struct wl_listener *listener, void *data)
 	 * generally at the output's refresh rate (e.g. 60Hz). */
 	Monitor *m = wl_container_of(listener, m, frame);
 	struct timespec now;
+	Client *c;
 
 	if (!wlr_scene_output_needs_frame(m->scene_output)) {
 		return;
 	}
+       wl_list_for_each(c, &clients, link)
+               if (c->serial && !c->isfloating && client_is_rendered_on_mon(c, m) && !client_is_stopped(c))
+                       goto skip;
 
 	wlr_scene_output_commit(m->scene_output, NULL);
+skip:
 	clock_gettime(CLOCK_MONOTONIC, &now);
 	wlr_scene_output_send_frame_done(m->scene_output, &now);
 }
@@ -2383,7 +2480,6 @@ void
 resize(Client *c, struct wlr_box geo, int interact)
 {
 	struct wlr_box *bbox;
-	struct wlr_box clip;
 
 	if (!c->mon || !client_surface(c)->mapped)
 		return;
@@ -2393,21 +2489,27 @@ resize(Client *c, struct wlr_box geo, int interact)
 	client_set_bounds(c, geo.width, geo.height);
 	c->geom = geo;
 	applybounds(c, bbox);
+	c->serial = client_set_size(c, c->geom.width - 2 * c->bw, c->geom.height - 2 * c->bw);
 
-	/* Update scene-graph, including borders */
-	wlr_scene_node_set_position(&c->scene->node, c->geom.x, c->geom.y);
-	wlr_scene_node_set_position(&c->scene_surface->node, c->bw, c->bw);
-	wlr_scene_rect_set_size(c->border[0], c->geom.width, c->bw);
-	wlr_scene_rect_set_size(c->border[1], c->geom.width, c->bw);
-	wlr_scene_rect_set_size(c->border[2], c->bw, c->geom.height - 2 * c->bw);
-	wlr_scene_rect_set_size(c->border[3], c->bw, c->geom.height - 2 * c->bw);
-	wlr_scene_node_set_position(&c->border[1]->node, 0, c->geom.height - c->bw);
-	wlr_scene_node_set_position(&c->border[2]->node, 0, c->bw);
-	wlr_scene_node_set_position(&c->border[3]->node, c->geom.width - c->bw, c->bw);
+	if (interact) {
+		c->animating = 0;
+		c->anim_cur = c->geom;
+		animation_apply(c, c->geom);
+		return;
+	}
 
-	client_set_size(c, c->geom.width - 2 * c->bw, c->geom.height - 2 * c->bw);
-	client_get_clip(c, &clip);
-	wlr_scene_subsurface_tree_set_clip(&c->scene_surface->node, &clip);
+	if (!c->animating && c->anim_cur.width == 0) {
+		c->anim_cur.width  = c->geom.width  / 2;
+		c->anim_cur.height = c->geom.height / 2;
+		c->anim_cur.x = c->geom.x + (c->geom.width  - c->anim_cur.width)  / 2;
+		c->anim_cur.y = c->geom.y + (c->geom.height - c->anim_cur.height) / 2;
+	}
+
+	c->anim_from  = c->anim_cur;
+	c->anim_to    = c->geom;
+	c->anim_start = animation_now_ms();
+	c->animating  = 1;
+	wl_event_source_timer_update(animation_timer, 1);
 }
 
 void
@@ -2635,6 +2737,7 @@ setup(void)
 	 * clients from the Unix socket, managing Wayland globals, and so on. */
 	dpy = wl_display_create();
 	event_loop = wl_display_get_event_loop(dpy);
+	animation_timer = wl_event_loop_add_timer(event_loop, animation_tick, NULL);
 
 	/* The backend is a wlroots feature which abstracts the underlying input and
 	 * output hardware. The autocreate option will choose the most suitable
@@ -2916,19 +3019,31 @@ tile(Monitor *m)
 		mw = m->nmaster ? (int)roundf(m->w.width * m->mfact) : 0;
 	else
 		mw = m->w.width;
+
 	i = my = ty = 0;
 	wl_list_for_each(c, &clients, link) {
+		struct wlr_box geo;
+
 		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen)
 			continue;
+
 		if (i < m->nmaster) {
-			resize(c, (struct wlr_box){.x = m->w.x, .y = m->w.y + my, .width = mw,
-				.height = (m->w.height - my) / (MIN(n, m->nmaster) - i)}, 0);
-			my += c->geom.height;
+			geo = (struct wlr_box){m->w.x, m->w.y + my, mw,
+				(m->w.height - my) / (MIN(n, m->nmaster) - i)};
+			my += geo.height;
 		} else {
-			resize(c, (struct wlr_box){.x = m->w.x + mw, .y = m->w.y + ty,
-				.width = m->w.width - mw, .height = (m->w.height - ty) / (n - i)}, 0);
-			ty += c->geom.height;
+			geo = (struct wlr_box){m->w.x + mw, m->w.y + ty, m->w.width - mw,
+				(m->w.height - ty) / (n - i)};
+			ty += geo.height;
 		}
+
+		if (c->status == CliOpening) {
+			c->anim_cur = (struct wlr_box){geo.x + geo.width / 4, geo.y + geo.height / 4,
+				geo.width / 2, geo.height / 2};
+			c->anim_from = c->anim_cur;
+			c->status = CliNormal;
+		}
+		resize(c, geo, 0);
 		i++;
 	}
 }
