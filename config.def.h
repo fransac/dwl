@@ -43,11 +43,17 @@ static int log_level = WLR_ERROR;
 
 /* Autostart */
 static const char *const autostart[] = {
-        "sh", "-c", "swaybg -m fill -i ~/.config/background", NULL,
-        "sh", "-c", "wayidle -t 60 " LOCKCMD, NULL,
-        "sh", "-c", "dbus-update-activation-environment XDG_CURRENT_DESKTOP=sway", NULL,
-        "sh", "-c", "dbus-update-activation-environment WAYLAND_DISPLAY", NULL,
-        NULL /* terminate */
+	"/bin/sh", "-c", "swaybg -m fill -i ~/.config/background", NULL,
+
+	"/bin/sh", "-c", "wayidle -t 60 " LOCKCMD, NULL,
+
+	"/bin/sh", "-c",
+	"dbus-update-activation-environment XDG_CURRENT_DESKTOP=sway", NULL,
+
+	"/bin/sh", "-c",
+	"dbus-update-activation-environment WAYLAND_DISPLAY", NULL,
+
+	NULL /* terminate */
 };
 
 static const Rule rules[] = {
