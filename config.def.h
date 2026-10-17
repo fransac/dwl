@@ -164,7 +164,6 @@ static const Key keys[] = {
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_q,                killclient,       {0} },
 	{ MODKEY,                    XKB_KEY_j,                focusstack,       {.i = +1} },
 	{ MODKEY,                    XKB_KEY_k,                focusstack,       {.i = -1} },
-	{ MODKEY,                    XKB_KEY_e,                zoom,             {0} },
 	{ MODKEY,                    XKB_KEY_space,            togglefloating,   {0} },
 	{ MODKEY,                    XKB_KEY_f,                togglefullscreen, {0} },
 	{ MODKEY,                    XKB_KEY_comma,            focusmon,         {.i = WLR_DIRECTION_LEFT} },
