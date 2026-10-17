@@ -9,6 +9,7 @@
 #define LOCKCMD "swaylock -eFfkl -i ~/.config/background -s fill"
 
 /* appearance */
+static const int tabletmaptosurface        = 1;  /* map tablet input to surface(1) or monitor(0) */
 static const int sloppyfocus               = 1;  /* focus follows mouse */
 static const int bypass_surface_visibility = 0;  /* 1 means idle inhibitors will disable idle tracking even if it's surface isn't visible  */
 static const int smartgaps                 = 0;  /* 1 means no outer gap when there is only one window */
@@ -22,6 +23,7 @@ static const char *fonts[]                 = {"monospace:size=10"};
 static const float rootcolor[]             = COLOR(0x000000ff);
 /* This conforms to the xdg-protocol. Set the alpha to zero to restore the old behavior */
 static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f}; /* You can also use glsl colors */
+static const double tablet_area[4]         = { 0.0, 0.0, 1.0, 1.0 }; /* pen active area: value 0.0 => 1.0; x, y, width, height */
 static uint32_t colors[][3]                = {
 	/*               fg          bg          border    */
 	[SchemeNorm] = { 0xffffffff, 0x000000b2, 0x000000b2},
@@ -211,4 +213,20 @@ static const Axis axes[] = {
 	{ MODKEY, AxisUp,   spawn, SHCMD("volume-up_EXAMPLE") },
 	{ MODKEY, AxisDown, spawn, SHCMD("volume-down_EXAMPLE") }, */
 	{ 0, 0, NULL, {0} },
+};
+
+static const TabletButton tabletbuttons[] = {
+    /* button       state                  function    argument */
+/*  { BTN_STYLUS,   WLR_BUTTON_PRESSED,    spawn,      {.v = termcmd} }, */
+/*  { BTN_STYLUS2,  WLR_BUTTON_PRESSED,    killclient, {0} }, */
+	{ 0,            0,                     NULL,       {0} }
+};
+
+static const TabletPadButton tabletpadbuttons[] = {
+	/* button  state                  function          argument */
+/*  { 0,       WLR_BUTTON_PRESSED,    spawn,            {.v = termcmd} }, */
+/*  { 1,       WLR_BUTTON_PRESSED,    killclient,       {0} },*/
+/*  { 2,       WLR_BUTTON_PRESSED,    togglefloating,   {0} },*/
+/*  { 3,       WLR_BUTTON_PRESSED,    zoom,             {0} },*/
+	{ 0,            0,                     NULL,       {0} }
 };
