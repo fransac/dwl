@@ -127,17 +127,17 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
 /* commands */
-#define TERMCMD       SHCMD("foot -a term")
-#define TERMFLOATCMD  SHCMD("foot -a termfloat")
-#define MENUCMD       SHCMD("wmenu-desktop")
-#define SCREENSHOTCMD SHCMD("grim -g \"$(slurp)\" - | wl-copy")
+#define TERMCMD       "foot -a term"
+#define TERMFLOATCMD  "foot -a termfloat"
+#define MENUCMD       "wmenu-desktop"
+#define SCREENSHOTCMD "grim -g \"$(slurp)\" - | wl-copy"
 
 static const Key keys[] = {
 	/* modifier                  key                  function          argument */
-	{ MODKEY,                    XKB_KEY_Return,      spawn,            TERMCMD },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,      spawn,            TERMFLOATCMD },
-	{ MODKEY,                    XKB_KEY_d,           spawn,            MENUCMD },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_s,           spawn,            SCREENSHOTCMD },
+	{ MODKEY,                    XKB_KEY_Return,      spawn,            SHCMD(TERMCMD) },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,      spawn,            SHCMD(TERMFLOATCMD) },
+	{ MODKEY,                    XKB_KEY_d,           spawn,            SHCMD(MENUCMD) },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_s,           spawn,            SHCMD(SCREENSHOTCMD) },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_q,           killclient,       {0} },
 	{ MODKEY,                    XKB_KEY_j,           focusstack,       {.i = +1} },
 	{ MODKEY,                    XKB_KEY_k,           focusstack,       {.i = -1} },
