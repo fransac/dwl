@@ -41,8 +41,9 @@ static const char *const autostart[] = {
 };
 
 static const Rule rules[] = {
-	/* app_id   title  tags mask  isfloating   monitor */
-	{ NULL,     NULL,  0,         0,           -1 },
+	/* app_id      title  tags mask  isfloating   monitor */
+	{ NULL,        NULL,  0,         0,           -1 },
+	{ "termfloat", NULL,  0,         1,           -1 },
 };
 
 /* layout(s) */
