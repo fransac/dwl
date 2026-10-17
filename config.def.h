@@ -133,6 +133,8 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 	{ MODKEY,                    KEY,            view,            {.ui = 1 << TAG} }, \
 	{ MODKEY|WLR_MODIFIER_SHIFT, KEY,            tag,             {.ui = 1 << TAG} }
 
+#define CHVT(n) { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_F##n, chvt, {.ui = (n)} }
+
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
@@ -170,15 +172,20 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_period,           focusmon,         {.i = WLR_DIRECTION_RIGHT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_comma,            tagmon,           {.i = WLR_DIRECTION_LEFT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_period,           tagmon,           {.i = WLR_DIRECTION_RIGHT} },
-	{ 0,                         XF86XK_AudioLowerVolume,  spawn,            SHCMD(VOLDOWN) },
-	{ 0,                         XF86XK_AudioRaiseVolume,  spawn,            SHCMD(VOLUP) },
-	{ 0,                         XF86XK_AudioMute,         spawn,            SHCMD(VOLMUTE) },
-	{ 0,                         XF86XK_AudioMicMute,      spawn,            SHCMD(VOLMICMUTE) },
-	{ 0,                         XF86XK_MonBrightnessDown, spawn,            SHCMD(LIGHTDOWN) },
-	{ 0,                         XF86XK_MonBrightnessUp,   spawn,            SHCMD(LIGHTUP) },
-	{ 0,                         XF86XK_AudioNext,         spawn,            SHCMD(PLAYERNEXT) },
-	{ 0,                         XF86XK_AudioPrev,         spawn,            SHCMD(PLAYERPREV) },
-	{ 0,                         XF86XK_AudioPlay,         spawn,            SHCMD(PLAYERPAUSE) },
+
+#define MEDIAKEYS \
+	{ 0,                         XF86XK_AudioLowerVolume,  spawn,            SHCMD(VOLDOWN) }, \
+	{ 0,                         XF86XK_AudioRaiseVolume,  spawn,            SHCMD(VOLUP) }, \
+	{ 0,                         XF86XK_AudioMute,         spawn,            SHCMD(VOLMUTE) }, \
+	{ 0,                         XF86XK_AudioMicMute,      spawn,            SHCMD(VOLMICMUTE) }, \
+	{ 0,                         XF86XK_MonBrightnessDown, spawn,            SHCMD(LIGHTDOWN) }, \
+	{ 0,                         XF86XK_MonBrightnessUp,   spawn,            SHCMD(LIGHTUP) }, \
+	{ 0,                         XF86XK_AudioNext,         spawn,            SHCMD(PLAYERNEXT) }, \
+	{ 0,                         XF86XK_AudioPrev,         spawn,            SHCMD(PLAYERPREV) }, \
+	{ 0,                         XF86XK_AudioPlay,         spawn,            SHCMD(PLAYERPAUSE) }
+
+	MEDIAKEYS,
+
 	TAGKEYS(                     XKB_KEY_1,                0),
 	TAGKEYS(                     XKB_KEY_2,                1),
 	TAGKEYS(                     XKB_KEY_3,                2),
@@ -195,7 +202,15 @@ static const Key keys[] = {
 	/* Ctrl-Alt-Fx is used to switch to another VT, if you don't know what a VT is
 	 * do not remove them.
 	 */
-#define CHVT(n) { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_F##n, chvt, {.ui = (n)} }
+	CHVT(1), CHVT(2), CHVT(3), CHVT(4), CHVT(5), CHVT(6),
+	CHVT(7), CHVT(8), CHVT(9), CHVT(10), CHVT(11), CHVT(12),
+};
+
+static const Key lockedkeys[] = {
+	MEDIAKEYS,
+
+	/* Ctrl-Alt-Backspace and Ctrl-Alt-Fx used to be handled by X server */
+	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_Terminate_Server, quit, {0} },
 	CHVT(1), CHVT(2), CHVT(3), CHVT(4), CHVT(5), CHVT(6),
 	CHVT(7), CHVT(8), CHVT(9), CHVT(10), CHVT(11), CHVT(12),
 };
