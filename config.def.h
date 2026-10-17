@@ -44,8 +44,8 @@ static const Rule rules[] = {
 
 /* layout(s) */
 static const Layout layouts[] = {
-	/* symbol     arrange function */
-	{ "[]=",      tile },
+	/* symbol  arrange function */
+	{  " ",    tile },
 };
 
 /* monitors */
