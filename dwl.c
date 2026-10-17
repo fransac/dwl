@@ -357,6 +357,7 @@ static void focusstack(const Arg *arg);
 static Client *focustop(Monitor *m);
 static void fullscreennotify(struct wl_listener *listener, void *data);
 static void gpureset(struct wl_listener *listener, void *data);
+static void grid(Monitor *m);
 static void handlesig(int signo);
 static void incnmaster(const Arg *arg);
 static void inputdevice(struct wl_listener *listener, void *data);
@@ -401,7 +402,6 @@ static void startdrag(struct wl_listener *listener, void *data);
 static int statusin(int fd, unsigned int mask, void *data);
 static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
-static void tile(Monitor *m);
 static void togglefloating(const Arg *arg);
 static void togglefullscreen(const Arg *arg);
 static void unlocksession(struct wl_listener *listener, void *data);
@@ -2049,6 +2049,64 @@ gpureset(struct wl_listener *listener, void *data)
 }
 
 void
+grid(Monitor *m)
+{
+	unsigned int e = m->gaps;
+	int i, n = 0, cols = 1, rows, row, col, rown;
+	int gap, area_h, cell_w, cell_h, rem_w, rem_h;
+	Client *c;
+
+	wl_list_for_each(c, &clients, link)
+		if (VISIBLEON(c, m) && !c->isfloating && !c->isfullscreen)
+			n++;
+	if (n == 0)
+		return;
+	if (smartgaps == n)
+		e = 0;
+
+	/* Use the smallest number of columns that can make a square grid. */
+	while (cols * cols < n)
+		cols++;
+	rows = (n + cols - 1) / cols;
+
+	gap = gappx * e;
+	area_h = m->w.height - gap * (rows + 1);
+	cell_h = area_h / rows;
+	rem_h = area_h % rows;
+
+	i = 0;
+	wl_list_for_each(c, &clients, link) {
+		struct wlr_box geo;
+
+		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen)
+			continue;
+
+		row = i / cols;
+		col = i % cols;
+		rown = MIN(cols, n - row * cols);
+
+		cell_w = (m->w.width - gap * (rown + 1)) / rown;
+		rem_w = (m->w.width - gap * (rown + 1)) % rown;
+
+		geo = (struct wlr_box){
+			m->w.x + gap + col * (cell_w + gap) + MIN(col, rem_w),
+			m->w.y + gap + row * (cell_h + gap) + MIN(row, rem_h),
+			cell_w + (col < rem_w),
+			cell_h + (row < rem_h)
+		};
+
+		if (c->status == CliOpening) {
+			c->anim_cur = (struct wlr_box){geo.x + geo.width / 4, geo.y + geo.height / 4,
+			              geo.width / 2, geo.height / 2};
+			c->anim_from = c->anim_cur;
+			c->status = CliNormal;
+		}
+		resize(c, geo, 0);
+		i++;
+	}
+}
+
+void
 handlesig(int signo)
 {
 	if (signo == SIGCHLD) {
@@ -3263,59 +3321,6 @@ tagmon(const Arg *arg)
 	Client *sel = focustop(selmon);
 	if (sel)
 		setmon(sel, dirtomon(arg->i), 0);
-}
-
-void
-tile(Monitor *m)
-{
-	unsigned int h, r, e = m->gaps, mw, my, ty;
-	int i, n = 0;
-	Client *c;
-
-	wl_list_for_each(c, &clients, link)
-		if (VISIBLEON(c, m) && !c->isfloating && !c->isfullscreen)
-			n++;
-	if (n == 0)
-		return;
-	if (smartgaps == n)
-		e = 0;
-
-	if (n > m->nmaster)
-		mw = m->nmaster ? (int)roundf((m->w.width + gappx*e) * m->mfact) : 0;
-	else
-		mw = m->w.width;
-
-	i = 0;
-	my = ty = gappx*e;
-	wl_list_for_each(c, &clients, link) {
-		struct wlr_box geo;
-
-		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen)
-			continue;
-
-		if (i < m->nmaster) {
-			r = MIN(n, m->nmaster) - i;
-			h = (m->w.height - my - gappx*e - gappx*e * (r - 1)) / r;
-			geo = (struct wlr_box){m->w.x + gappx*e, m->w.y + my,
-			       mw - 2*gappx*e, h};
-			my += geo.height + gappx*e;
-		} else {
-			r = n - i;
-			h = (m->w.height - ty - gappx*e - gappx*e * (r - 1)) / r;
-			geo = (struct wlr_box){m->w.x + mw, m->w.y + ty,
-			      m->w.width - mw - gappx*e, h};
-			ty += geo.height + gappx*e;
-		}
-
-		if (c->status == CliOpening) {
-			c->anim_cur = (struct wlr_box){geo.x + geo.width / 4, geo.y + geo.height / 4,
-				geo.width / 2, geo.height / 2};
-			c->anim_from = c->anim_cur;
-			c->status = CliNormal;
-		}
-		resize(c, geo, 0);
-		i++;
-	}
 }
 
 void
