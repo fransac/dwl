@@ -3,6 +3,9 @@
                         ((hex >> 16) & 0xFF) / 255.0f, \
                         ((hex >> 8) & 0xFF) / 255.0f, \
                         (hex & 0xFF) / 255.0f }
+
+#define LOCKCMD "swaylock -eFfkl -i ~/.config/background -s fill"
+
 /* appearance */
 static const int sloppyfocus               = 1;  /* focus follows mouse */
 static const int bypass_surface_visibility = 0;  /* 1 means idle inhibitors will disable idle tracking even if it's surface isn't visible  */
@@ -37,6 +40,7 @@ static int log_level = WLR_ERROR;
 /* Autostart */
 static const char *const autostart[] = {
         "sh", "-c", "swaybg -m fill -i ~/.config/background", NULL,
+        "sh", "-c", "wayidle -t 60" LOCKCMD, NULL,
         NULL /* terminate */
 };
 
@@ -138,6 +142,7 @@ static const Key keys[] = {
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,      spawn,            SHCMD(TERMFLOATCMD) },
 	{ MODKEY,                    XKB_KEY_d,           spawn,            SHCMD(MENUCMD) },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_s,           spawn,            SHCMD(SCREENSHOTCMD) },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_x,           spawn,            SHCMD(LOCKCMD) },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_q,           killclient,       {0} },
 	{ MODKEY,                    XKB_KEY_j,           focusstack,       {.i = +1} },
 	{ MODKEY,                    XKB_KEY_k,           focusstack,       {.i = -1} },
