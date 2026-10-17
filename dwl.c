@@ -246,6 +246,7 @@ struct Monitor {
 	struct wlr_box w; /* window area, layout-relative */
 	struct wl_list layers[4]; /* LayerSurface.link */
 	const Layout *lt[2];
+	int gaps;
 	unsigned int seltags;
 	unsigned int sellt;
 	uint32_t tagset[2];
@@ -1451,6 +1452,8 @@ createmon(struct wl_listener *listener, void *data)
 
 	wlr_output_state_init(&state);
 	/* Initialize monitor state using configured rules */
+	m->gaps = gaps;
+
 	m->tagset[0] = m->tagset[1] = 1;
 	for (r = monrules; r < END(monrules); r++) {
 		if (!r->name || strstr(wlr_output->name, r->name)) {
@@ -3266,7 +3269,7 @@ tagmon(const Arg *arg)
 void
 tile(Monitor *m)
 {
-	unsigned int mw, my, ty;
+	unsigned int h, r, e = m->gaps, mw, my, ty;
 	int i, n = 0;
 	Client *c;
 
@@ -3275,13 +3278,16 @@ tile(Monitor *m)
 			n++;
 	if (n == 0)
 		return;
+	if (smartgaps == n)
+		e = 0;
 
 	if (n > m->nmaster)
-		mw = m->nmaster ? (int)roundf(m->w.width * m->mfact) : 0;
+		mw = m->nmaster ? (int)roundf((m->w.width + gappx*e) * m->mfact) : 0;
 	else
 		mw = m->w.width;
 
-	i = my = ty = 0;
+	i = 0;
+	my = ty = gappx*e;
 	wl_list_for_each(c, &clients, link) {
 		struct wlr_box geo;
 
@@ -3289,13 +3295,17 @@ tile(Monitor *m)
 			continue;
 
 		if (i < m->nmaster) {
-			geo = (struct wlr_box){m->w.x, m->w.y + my, mw,
-				(m->w.height - my) / (MIN(n, m->nmaster) - i)};
-			my += geo.height;
+			r = MIN(n, m->nmaster) - i;
+			h = (m->w.height - my - gappx*e - gappx*e * (r - 1)) / r;
+			geo = (struct wlr_box){m->w.x + gappx*e, m->w.y + my,
+			       mw - 2*gappx*e, h};
+			my += geo.height + gappx*e;
 		} else {
-			geo = (struct wlr_box){m->w.x + mw, m->w.y + ty, m->w.width - mw,
-				(m->w.height - ty) / (n - i)};
-			ty += geo.height;
+			r = n - i;
+			h = (m->w.height - ty - gappx*e - gappx*e * (r - 1)) / r;
+			geo = (struct wlr_box){m->w.x + mw, m->w.y + ty,
+			      m->w.width - mw - gappx*e, h};
+			ty += geo.height + gappx*e;
 		}
 
 		if (c->status == CliOpening) {
@@ -3316,6 +3326,13 @@ togglebar(const Arg *arg)
 		!selmon->scene_buffer->node.enabled);
 	arrangelayers(selmon);
 	drawbars();
+}
+
+void
+togglegaps(const Arg *arg)
+{
+	selmon->gaps = !selmon->gaps;
+	arrange(selmon);
 }
 
 void
