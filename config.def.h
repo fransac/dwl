@@ -48,7 +48,7 @@ static const char *const autostart[] = {
 	"/bin/sh", "-c", "widle -t 60 " LOCKCMD, NULL,
 
 	"/bin/sh", "-c",
-	"dbus-update-activation-environment XDG_CURRENT_DESKTOP=sway", NULL,
+	"dbus-update-activation-environment XDG_CURRENT_DESKTOP=wlroots", NULL,
 
 	"/bin/sh", "-c",
 	"dbus-update-activation-environment WAYLAND_DISPLAY", NULL,
