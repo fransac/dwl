@@ -6,7 +6,7 @@
                         ((hex >> 8) & 0xFF) / 255.0f, \
                         (hex & 0xFF) / 255.0f }
 
-#define LOCKCMD "swaylock -eFfkl -i ~/.config/background -s fill"
+#define LOCKCMD "wlock"
 
 /* appearance */
 static const int tabletmaptosurface        = 1;  /* map tablet input to surface(1) or monitor(0) */
@@ -45,7 +45,7 @@ static int log_level = WLR_ERROR;
 static const char *const autostart[] = {
 	"/bin/sh", "-c", "swaybg -m fill -i ~/.config/background", NULL,
 
-	"/bin/sh", "-c", "wayidle -t 60 " LOCKCMD, NULL,
+	"/bin/sh", "-c", "widle -t 60 " LOCKCMD, NULL,
 
 	"/bin/sh", "-c",
 	"dbus-update-activation-environment XDG_CURRENT_DESKTOP=sway", NULL,
