@@ -1,3 +1,5 @@
+#include <X11/XF86keysym.h>
+
 /* Taken from https://github.com/djpohly/dwl/issues/466 */
 #define COLOR(hex)    { ((hex >> 24) & 0xFF) / 255.0f, \
                         ((hex >> 16) & 0xFF) / 255.0f, \
@@ -138,34 +140,55 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 #define MENUCMD       "wmenu-desktop"
 #define SCREENSHOTCMD "grim -g \"$(slurp)\" - | wl-copy"
 
+#define VOLDOWN    "amixer set Master 5%-"
+#define VOLUP      "amixer set Master 5%+"
+#define VOLMUTE    "amixer set Master toggle"
+#define VOLMICMUTE "amixer set Capture toggle"
+
+#define LIGHTDOWN "brightnessctl set 5%-"
+#define LIGHTUP   "brightnessctl set 5%+"
+
+#define PLAYERNEXT  "playerctl next"
+#define PLAYERPREV  "playerctl previous"
+#define PLAYERPAUSE "playerctl play-pause"
+
 static const Key keys[] = {
-	/* modifier                  key                  function          argument */
-	{ MODKEY,                    XKB_KEY_Return,      spawn,            SHCMD(TERMCMD) },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,      spawn,            SHCMD(TERMFLOATCMD) },
-	{ MODKEY,                    XKB_KEY_d,           spawn,            SHCMD(MENUCMD) },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_s,           spawn,            SHCMD(SCREENSHOTCMD) },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_x,           spawn,            SHCMD(LOCKCMD) },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_q,           killclient,       {0} },
-	{ MODKEY,                    XKB_KEY_j,           focusstack,       {.i = +1} },
-	{ MODKEY,                    XKB_KEY_k,           focusstack,       {.i = -1} },
-	{ MODKEY,                    XKB_KEY_e,           zoom,             {0} },
-	{ MODKEY,                    XKB_KEY_space,       setlayout,        {0} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_space,       togglefloating,   {0} },
-	{ MODKEY,                    XKB_KEY_f,           togglefullscreen, {0} },
-	{ MODKEY,                    XKB_KEY_comma,       focusmon,         {.i = WLR_DIRECTION_LEFT} },
-	{ MODKEY,                    XKB_KEY_period,      focusmon,         {.i = WLR_DIRECTION_RIGHT} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_comma,       tagmon,           {.i = WLR_DIRECTION_LEFT} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_period,      tagmon,           {.i = WLR_DIRECTION_RIGHT} },
-	TAGKEYS(                     XKB_KEY_1,           0),
-	TAGKEYS(                     XKB_KEY_2,           1),
-	TAGKEYS(                     XKB_KEY_3,           2),
-	TAGKEYS(                     XKB_KEY_4,           3),
-	TAGKEYS(                     XKB_KEY_5,           4),
-	TAGKEYS(                     XKB_KEY_6,           5),
-	TAGKEYS(                     XKB_KEY_7,           6),
-	TAGKEYS(                     XKB_KEY_8,           7),
-	TAGKEYS(                     XKB_KEY_9,           8),
-	TAGKEYS(                     XKB_KEY_0,           9),
+	/* modifier                  key                       function          argument */
+	{ MODKEY,                    XKB_KEY_Return,           spawn,            SHCMD(TERMCMD) },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,           spawn,            SHCMD(TERMFLOATCMD) },
+	{ MODKEY,                    XKB_KEY_d,                spawn,            SHCMD(MENUCMD) },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_s,                spawn,            SHCMD(SCREENSHOTCMD) },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_x,                spawn,            SHCMD(LOCKCMD) },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_q,                killclient,       {0} },
+	{ MODKEY,                    XKB_KEY_j,                focusstack,       {.i = +1} },
+	{ MODKEY,                    XKB_KEY_k,                focusstack,       {.i = -1} },
+	{ MODKEY,                    XKB_KEY_e,                zoom,             {0} },
+	{ MODKEY,                    XKB_KEY_space,            setlayout,        {0} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_space,            togglefloating,   {0} },
+	{ MODKEY,                    XKB_KEY_f,                togglefullscreen, {0} },
+	{ MODKEY,                    XKB_KEY_comma,            focusmon,         {.i = WLR_DIRECTION_LEFT} },
+	{ MODKEY,                    XKB_KEY_period,           focusmon,         {.i = WLR_DIRECTION_RIGHT} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_comma,            tagmon,           {.i = WLR_DIRECTION_LEFT} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_period,           tagmon,           {.i = WLR_DIRECTION_RIGHT} },
+	{ 0,                         XF86XK_AudioLowerVolume,  spawn,            SHCMD(VOLDOWN) },
+	{ 0,                         XF86XK_AudioRaiseVolume,  spawn,            SHCMD(VOLUP) },
+	{ 0,                         XF86XK_AudioMute,         spawn,            SHCMD(VOLMUTE) },
+	{ 0,                         XF86XK_AudioMicMute,      spawn,            SHCMD(VOLMICMUTE) },
+	{ 0,                         XF86XK_MonBrightnessDown, spawn,            SHCMD(LIGHTDOWN) },
+	{ 0,                         XF86XK_MonBrightnessUp,   spawn,            SHCMD(LIGHTUP) },
+	{ 0,                         XF86XK_AudioNext,         spawn,            SHCMD(PLAYERNEXT) },
+	{ 0,                         XF86XK_AudioPrev,         spawn,            SHCMD(PLAYERPREV) },
+	{ 0,                         XF86XK_AudioPlay,         spawn,            SHCMD(PLAYERPAUSE) },
+	TAGKEYS(                     XKB_KEY_1,                0),
+	TAGKEYS(                     XKB_KEY_2,                1),
+	TAGKEYS(                     XKB_KEY_3,                2),
+	TAGKEYS(                     XKB_KEY_4,                3),
+	TAGKEYS(                     XKB_KEY_5,                4),
+	TAGKEYS(                     XKB_KEY_6,                5),
+	TAGKEYS(                     XKB_KEY_7,                6),
+	TAGKEYS(                     XKB_KEY_8,                7),
+	TAGKEYS(                     XKB_KEY_9,                8),
+	TAGKEYS(                     XKB_KEY_0,                9),
 
 	/* Ctrl-Alt-Backspace and Ctrl-Alt-Fx used to be handled by X server */
 	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_BackSpace, quit, {0} },
