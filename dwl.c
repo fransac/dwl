@@ -402,7 +402,6 @@ static int statusin(int fd, unsigned int mask, void *data);
 static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
 static void tile(Monitor *m);
-static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
 static void togglefullscreen(const Arg *arg);
 static void unlocksession(struct wl_listener *listener, void *data);
@@ -3317,15 +3316,6 @@ tile(Monitor *m)
 		resize(c, geo, 0);
 		i++;
 	}
-}
-
-void
-togglebar(const Arg *arg)
-{
-	wlr_scene_node_set_enabled(&selmon->scene_buffer->node,
-		!selmon->scene_buffer->node.enabled);
-	arrangelayers(selmon);
-	drawbars();
 }
 
 void
