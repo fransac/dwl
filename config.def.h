@@ -6,8 +6,6 @@
                         ((hex >> 8) & 0xFF) / 255.0f, \
                         (hex & 0xFF) / 255.0f }
 
-#define LOCKCMD "wlock"
-
 /* appearance */
 static const int tabletmaptosurface        = 1;  /* map tablet input to surface(1) or monitor(0) */
 static const int sloppyfocus               = 1;  /* focus follows mouse */
@@ -43,16 +41,7 @@ static int log_level = WLR_ERROR;
 
 /* Autostart */
 static const char *const autostart[] = {
-	"/bin/sh", "-c", "swaybg -m fill -i ~/.config/background", NULL,
-
-	"/bin/sh", "-c", "widle -t 60 " LOCKCMD, NULL,
-
-	"/bin/sh", "-c",
-	"dbus-update-activation-environment XDG_CURRENT_DESKTOP=wlroots", NULL,
-
-	"/bin/sh", "-c",
-	"dbus-update-activation-environment WAYLAND_DISPLAY", NULL,
-
+	"/bin/sh", "-c", ". ~/.config/autostart", NULL,
 	NULL /* terminate */
 };
 
@@ -149,6 +138,8 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 #define TERMFLOATCMD  "foot -a termfloat"
 #define MENUCMD       "wmenu-desktop"
 #define SCREENSHOTCMD "grim -g \"$(slurp)\" - | wl-copy"
+
+#define LOCKCMD "lock"
 
 #define VOLDOWN    "amixer set Master 5%-"
 #define VOLUP      "amixer set Master 5%+"
