@@ -51,19 +51,13 @@ static const Rule rules[] = {
 	{ "termfloat", NULL,  0,         1,           -1 },
 };
 
-/* layout(s) */
-static const Layout layouts[] = {
-	/* symbol  arrange function */
-	{  " ",    grid },
-};
-
 /* monitors */
 /* (x=-1, y=-1) is reserved as an "autoconfigure" monitor position indicator
  * WARNING: negative values other than (-1, -1) cause problems with Xwayland clients due to
  * https://gitlab.freedesktop.org/xorg/xserver/-/issues/899 */
 static const MonitorRule monrules[] = {
-	/* name  scale  layout       rotate/reflect              x   y */
-	{  NULL, 2,     &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL, -1, -1 },
+	/* name  scale  rotate/reflect              x   y */
+	{  NULL, 2,     WL_OUTPUT_TRANSFORM_NORMAL, -1, -1 },
 };
 
 /* keyboard */
