@@ -2883,6 +2883,12 @@ resize(Client *c, struct wlr_box geo, int interact)
 	if (!c->mon || !client_surface(c)->mapped)
 		return;
 
+	if (c->isfloating) {
+		c->bw = 0;
+	} else {
+		c->bw = borderpx;
+	}
+
 	bbox = interact ? &sgeom : &c->mon->w;
 
 	client_set_bounds(c, geo.width, geo.height);
