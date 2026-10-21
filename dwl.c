@@ -2586,14 +2586,6 @@ motionnotify(uint32_t time, struct wlr_input_device *device, double dx, double d
 		/* Move the grabbed client to the new position. */
 		nx = (int)round(cursor->x) - grabcx;
 		ny = (int)round(cursor->y) - grabcy;
-		if (abs(selmon->w.x - nx) < (int)snap)
-			nx = selmon->w.x;
-		else if (abs((selmon->w.x + selmon->w.width) - (nx + grabc->geom.width)) < (int)snap)
-			nx = selmon->w.x + selmon->w.width - grabc->geom.width;
-		if (abs(selmon->w.y - ny) < (int)snap)
-			ny = selmon->w.y;
-		else if (abs((selmon->w.y + selmon->w.height) - (ny + grabc->geom.height)) < (int)snap)
-			ny = selmon->w.y + selmon->w.height - grabc->geom.height;
 		resize(grabc, (struct wlr_box){.x = nx, .y = ny,
 			.width = grabc->geom.width, .height = grabc->geom.height}, 1);
 		return;
