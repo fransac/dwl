@@ -34,7 +34,7 @@ static const unsigned int animation_duration = 300; /* ms */
 static const float animation_curve[4] = {0.0f, 0.85f, 0.2f, 1.0f}; /* cubic-bezier x1, y1, x2, y2 */
 
 /* tagging */
-static char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" };
+static char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };
 
 /* logging */
 static int log_level = WLR_ERROR;
