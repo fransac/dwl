@@ -383,6 +383,7 @@ static void motionnotify(uint32_t time, struct wlr_input_device *device, double 
 		double sy, double sx_unaccel, double sy_unaccel);
 static void motionrelative(struct wl_listener *listener, void *data);
 static void moveresize(const Arg *arg);
+static void moveresizekb(const Arg *arg);
 static void outputmgrapply(struct wl_listener *listener, void *data);
 static void outputmgrapplyortest(struct wlr_output_configuration_v1 *config, int test);
 static void outputmgrtest(struct wl_listener *listener, void *data);
@@ -2646,6 +2647,28 @@ moveresize(const Arg *arg)
 		wlr_cursor_set_xcursor(cursor, cursor_mgr, "se-resize");
 		break;
 	}
+}
+
+void
+moveresizekb(const Arg *arg)
+{
+	Client *c = focustop(selmon);
+	Monitor *m = selmon;
+
+	if(!(m && arg && arg->v && c)){
+		return;
+	}
+
+	if(!c->isfloating){
+		return;
+	}
+
+	resize(c, (struct wlr_box){
+		.x = c->geom.x + ((int *)arg->v)[0],
+		.y = c->geom.y + ((int *)arg->v)[1],
+		.width = c->geom.width + ((int *)arg->v)[2],
+		.height = c->geom.height + ((int *)arg->v)[3],
+	}, 1);
 }
 
 void

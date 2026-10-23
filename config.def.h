@@ -162,6 +162,14 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_period,           focusmon,         {.i = WLR_DIRECTION_RIGHT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_comma,            tagmon,           {.i = WLR_DIRECTION_LEFT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_period,           tagmon,           {.i = WLR_DIRECTION_RIGHT} },
+	{ MODKEY,                    XKB_KEY_Down,             moveresizekb,     {.v = (int []){0, 40, 0, 0}} },
+	{ MODKEY,                    XKB_KEY_Up,               moveresizekb,     {.v = (int []){0, -40, 0, 0}} },
+	{ MODKEY,                    XKB_KEY_Right,            moveresizekb,     {.v = (int []){40, 0, 0, 0}} },
+	{ MODKEY,                    XKB_KEY_Left,             moveresizekb,     {.v = (int []){-40, 0, 0, 0}} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Down,             moveresizekb,     {.v = (int []){0, 0, 0, 40}} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Up,               moveresizekb,     {.v = (int []){0, 0, 0, -40}} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Right,            moveresizekb,     {.v = (int []){0, 0, 40, 0}} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Left,             moveresizekb,     {.v = (int []){0, 0, -40, 0}} },
 
 #define MEDIAKEYS \
 	{ 0,                         XF86XK_AudioLowerVolume,  spawn,            SHCMD(VOLDOWN) }, \
