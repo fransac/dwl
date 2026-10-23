@@ -148,10 +148,10 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 
 static const Key keys[] = {
 	/* modifier                  key                       function          argument */
-	{ MODKEY,                    XKB_KEY_Return,           spawn,            SHCMD(TERMCMD) },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,           spawn,            SHCMD(TERMFLOATCMD) },
-	{ MODKEY,                    XKB_KEY_d,                spawn,            SHCMD(MENUCMD) },
-	{ MODKEY,                    XKB_KEY_s,                spawn,            SHCMD(SCREENSHOTCMD) },
+	{ MODKEY,                    XKB_KEY_t,                spawn,            SHCMD(TERMCMD) },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_t,                spawn,            SHCMD(TERMFLOATCMD) },
+	{ MODKEY,                    XKB_KEY_p,                spawn,            SHCMD(MENUCMD) },
+	{ MODKEY,                    XKB_KEY_o,                spawn,            SHCMD(SCREENSHOTCMD) },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_x,                spawn,            SHCMD(LOCKCMD) },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_q,                killclient,       {0} },
 	{ MODKEY,                    XKB_KEY_j,                focusstack,       {.i = +1} },
@@ -164,14 +164,14 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_period,           focusmon,         {.i = WLR_DIRECTION_RIGHT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_comma,            tagmon,           {.i = WLR_DIRECTION_LEFT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_period,           tagmon,           {.i = WLR_DIRECTION_RIGHT} },
-	{ MODKEY,                    XKB_KEY_Down,             moveresizekb,     {.v = (int []){0, 40, 0, 0}} },
-	{ MODKEY,                    XKB_KEY_Up,               moveresizekb,     {.v = (int []){0, -40, 0, 0}} },
-	{ MODKEY,                    XKB_KEY_Right,            moveresizekb,     {.v = (int []){40, 0, 0, 0}} },
-	{ MODKEY,                    XKB_KEY_Left,             moveresizekb,     {.v = (int []){-40, 0, 0, 0}} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Down,             moveresizekb,     {.v = (int []){0, 0, 0, 40}} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Up,               moveresizekb,     {.v = (int []){0, 0, 0, -40}} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Right,            moveresizekb,     {.v = (int []){0, 0, 40, 0}} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Left,             moveresizekb,     {.v = (int []){0, 0, -40, 0}} },
+	{ MODKEY,                    XKB_KEY_s,                moveresizekb,     {.v = (int []){0, 40, 0, 0}} },
+	{ MODKEY,                    XKB_KEY_w,                moveresizekb,     {.v = (int []){0, -40, 0, 0}} },
+	{ MODKEY,                    XKB_KEY_d,                moveresizekb,     {.v = (int []){40, 0, 0, 0}} },
+	{ MODKEY,                    XKB_KEY_a,                moveresizekb,     {.v = (int []){-40, 0, 0, 0}} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_s,                moveresizekb,     {.v = (int []){0, 0, 0, 40}} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_w,                moveresizekb,     {.v = (int []){0, 0, 0, -40}} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_d,                moveresizekb,     {.v = (int []){0, 0, 40, 0}} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_a,                moveresizekb,     {.v = (int []){0, 0, -40, 0}} },
 
 #define MEDIAKEYS \
 	{ 0,                         XF86XK_AudioLowerVolume,  spawn,            SHCMD(VOLDOWN) }, \
