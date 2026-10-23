@@ -384,12 +384,16 @@ static void motionnotify(uint32_t time, struct wlr_input_device *device, double 
 static void motionrelative(struct wl_listener *listener, void *data);
 static void moveresize(const Arg *arg);
 static void moveresizekb(const Arg *arg);
+static Client *nextclient(Client *sel);
 static void outputmgrapply(struct wl_listener *listener, void *data);
 static void outputmgrapplyortest(struct wlr_output_configuration_v1 *config, int test);
 static void outputmgrtest(struct wl_listener *listener, void *data);
 static void pointerfocus(Client *c, LayerSurface* l, struct wlr_surface *surface,
 		double sx, double sy, uint32_t time);
 static void powermgrsetmode(struct wl_listener *listener, void *data);
+static Client *prevclient(Client *sel);
+static void pushdown(const Arg *arg);
+static void pushup(const Arg *arg);
 static void quit(const Arg *arg);
 static void rendermon(struct wl_listener *listener, void *data);
 static void requestdecorationmode(struct wl_listener *listener, void *data);
@@ -2671,6 +2675,18 @@ moveresizekb(const Arg *arg)
 	}, 1);
 }
 
+static Client *
+nextclient(Client *sel) {
+	Client *c;
+	wl_list_for_each(c, &sel->link, link) {
+		if (&c->link == &clients)
+			break;  /* don't wrap */
+		if (!c->isfloating && VISIBLEON(c, selmon))
+			return c;
+	}
+	return NULL;
+}
+
 void
 outputmgrapply(struct wl_listener *listener, void *data)
 {
@@ -2808,6 +2824,58 @@ powermgrsetmode(struct wl_listener *listener, void *data)
 
 	m->asleep = !event->mode;
 	updatemons(NULL, NULL);
+}
+
+static Client *
+prevclient(Client *sel) {
+	Client *c;
+	wl_list_for_each_reverse(c, &sel->link, link) {
+		if (&c->link == &clients)
+			break;  /* don't wrap */
+		if (!c->isfloating && VISIBLEON(c, selmon))
+			return c;
+	}
+	return NULL;
+}
+
+static void
+pushdown(const Arg *arg) {
+	Client *sel = focustop(selmon);
+	Client *c;
+
+	if(!sel || sel->isfloating)
+		return;
+	if((c = nextclient(sel))) {
+		/* attach after c */
+		wl_list_remove(&sel->link);
+		wl_list_insert(&c->link, &sel->link);
+	} else {
+		/* move to the front */
+		wl_list_remove(&sel->link);
+		wl_list_insert(&clients, &sel->link);
+	}
+	focusclient(sel, NULL, 1);
+	arrange(selmon);
+}
+
+static void
+pushup(const Arg *arg) {
+	Client *sel = focustop(selmon);
+	Client *c;
+
+	if(!sel || sel->isfloating)
+		return;
+	if((c = prevclient(sel))) {
+		/* attach before c */
+		wl_list_remove(&sel->link);
+		wl_list_insert(c->link.prev, &sel->link);
+	} else {
+		/* move to the end */
+		wl_list_remove(&sel->link);
+		wl_list_insert(clients.prev, &sel->link);
+	}
+	focusclient(sel, NULL, 1);
+	arrange(selmon);
 }
 
 void
