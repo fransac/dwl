@@ -2976,7 +2976,7 @@ setfloating(Client *c, int floating)
 	/* If in floating layout do not change the client's layer */
 	if (!c->mon || !client_surface(c)->mapped)
 		return;
-	c->bw = floating ? 0 : borderpx;
+	c->bw = floating || c->isfullscreen ? 0 : borderpx;
 	wlr_scene_node_reparent(&c->scene->node, layers[c->isfullscreen ||
 			(p && p->isfullscreen) ? LyrFS
 			: c->isfloating ? LyrFloat : LyrTile]);
@@ -2990,7 +2990,7 @@ setfullscreen(Client *c, int fullscreen)
 	c->isfullscreen = fullscreen;
 	if (!c->mon || !client_surface(c)->mapped)
 		return;
-	c->bw = fullscreen ? 0 : borderpx;
+	c->bw = fullscreen || c->isfloating ? 0 : borderpx;
 	client_set_fullscreen(c, fullscreen);
 	wlr_scene_node_reparent(&c->scene->node, layers[c->isfullscreen
 			? LyrFS : c->isfloating ? LyrFloat : LyrTile]);
