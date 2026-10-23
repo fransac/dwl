@@ -115,10 +115,6 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 /* If you want to use the windows key for MODKEY, use WLR_MODIFIER_LOGO */
 #define MODKEY WLR_MODIFIER_ALT
 
-#define TAGKEYS(KEY,TAG) \
-	{ MODKEY,                    KEY,            view,            {.ui = 1 << TAG} }, \
-	{ MODKEY|WLR_MODIFIER_SHIFT, KEY,            tag,             {.ui = 1 << TAG} }
-
 #define CHVT(n) { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_F##n, chvt, {.ui = (n)} }
 
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
@@ -146,12 +142,22 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 
 static const Key keys[] = {
 	/* modifier                  key                       function          argument */
+	{ MODKEY,                    XKB_KEY_bracketleft,      spawn,            SHCMD(VOLDOWN) },
+	{ MODKEY,                    XKB_KEY_bracketright,     spawn,            SHCMD(VOLUP) },
+	{ MODKEY,                    XKB_KEY_backslash,        spawn,            SHCMD(VOLMUTE) },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_bracketleft,      spawn,            SHCMD(PLAYERNEXT) },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_bracketright,     spawn,            SHCMD(PLAYERPREV) },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_backslash,        spawn,            SHCMD(PLAYERPAUSE) },
+	{ MODKEY,                    XKB_KEY_minus,            spawn,            SHCMD(LIGHTDOWN) },
+	{ MODKEY,                    XKB_KEY_equal,            spawn,            SHCMD(LIGHTUP) },
+
 	{ MODKEY,                    XKB_KEY_t,                spawn,            SHCMD(TERMCMD) },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_t,                spawn,            SHCMD(TERMFLOATCMD) },
 	{ MODKEY,                    XKB_KEY_p,                spawn,            SHCMD(MENUCMD) },
 	{ MODKEY,                    XKB_KEY_o,                spawn,            SHCMD(SCREENSHOTCMD) },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_o,                spawn,            SHCMD(SCREENSHOTSELCMD) },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_x,                spawn,            SHCMD(LOCKCMD) },
+
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_q,                killclient,       {0} },
 	{ MODKEY,                    XKB_KEY_j,                focusstack,       {.i = +1} },
 	{ MODKEY,                    XKB_KEY_k,                focusstack,       {.i = -1} },
@@ -172,28 +178,27 @@ static const Key keys[] = {
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_d,                moveresizekb,     {.v = (int []){0, 0, 40, 0}} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_a,                moveresizekb,     {.v = (int []){0, 0, -40, 0}} },
 
-#define MEDIAKEYS \
-	{ MODKEY,                    XKB_KEY_bracketleft,      spawn,            SHCMD(VOLDOWN) }, \
-	{ MODKEY,                    XKB_KEY_bracketright,     spawn,            SHCMD(VOLUP) }, \
-	{ MODKEY,                    XKB_KEY_backslash,        spawn,            SHCMD(VOLMUTE) }, \
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_bracketleft,      spawn,            SHCMD(PLAYERNEXT) }, \
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_bracketright,     spawn,            SHCMD(PLAYERPREV) }, \
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_backslash,        spawn,            SHCMD(PLAYERPAUSE) }, \
-	{ MODKEY,                    XKB_KEY_minus,            spawn,            SHCMD(LIGHTDOWN) }, \
-	{ MODKEY,                    XKB_KEY_equal,            spawn,            SHCMD(LIGHTUP) }
+	{ MODKEY,                    XKB_KEY_1,                view,            {.ui = 1 << 0} },
+	{ MODKEY,                    XKB_KEY_2,                view,            {.ui = 1 << 1} },
+	{ MODKEY,                    XKB_KEY_3,                view,            {.ui = 1 << 2} },
+	{ MODKEY,                    XKB_KEY_4,                view,            {.ui = 1 << 3} },
+	{ MODKEY,                    XKB_KEY_5,                view,            {.ui = 1 << 4} },
+	{ MODKEY,                    XKB_KEY_6,                view,            {.ui = 1 << 5} },
+	{ MODKEY,                    XKB_KEY_7,                view,            {.ui = 1 << 6} },
+	{ MODKEY,                    XKB_KEY_8,                view,            {.ui = 1 << 7} },
+	{ MODKEY,                    XKB_KEY_9,                view,            {.ui = 1 << 8} },
+	{ MODKEY,                    XKB_KEY_0,                view,            {.ui = 1 << 9} },
 
-	MEDIAKEYS,
-
-	TAGKEYS(                     XKB_KEY_1,                0),
-	TAGKEYS(                     XKB_KEY_2,                1),
-	TAGKEYS(                     XKB_KEY_3,                2),
-	TAGKEYS(                     XKB_KEY_4,                3),
-	TAGKEYS(                     XKB_KEY_5,                4),
-	TAGKEYS(                     XKB_KEY_6,                5),
-	TAGKEYS(                     XKB_KEY_7,                6),
-	TAGKEYS(                     XKB_KEY_8,                7),
-	TAGKEYS(                     XKB_KEY_9,                8),
-	TAGKEYS(                     XKB_KEY_0,                9),
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_1,                tag,             {.ui = 1 << 0} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_2,                tag,             {.ui = 1 << 1} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_3,                tag,             {.ui = 1 << 2} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_4,                tag,             {.ui = 1 << 3} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_5,                tag,             {.ui = 1 << 4} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_6,                tag,             {.ui = 1 << 5} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_7,                tag,             {.ui = 1 << 6} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_8,                tag,             {.ui = 1 << 7} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_9,                tag,             {.ui = 1 << 8} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_0,                tag,             {.ui = 1 << 9} },
 
 	/* Ctrl-Alt-Backspace and Ctrl-Alt-Fx used to be handled by X server */
 	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_BackSpace, quit, {0} },
@@ -205,7 +210,8 @@ static const Key keys[] = {
 };
 
 static const Key lockedkeys[] = {
-	MEDIAKEYS,
+	keys[0], keys[1], keys[2], keys[3], keys[4], keys[5],
+	keys[6], keys[7],
 
 	/* Ctrl-Alt-Backspace and Ctrl-Alt-Fx used to be handled by X server */
 	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_Terminate_Server, quit, {0} },
