@@ -1,5 +1,3 @@
-#include <X11/XF86keysym.h>
-
 /* Taken from https://github.com/djpohly/dwl/issues/466 */
 #define COLOR(hex)    { ((hex >> 24) & 0xFF) / 255.0f, \
                         ((hex >> 16) & 0xFF) / 255.0f, \
@@ -138,14 +136,13 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 #define VOLDOWN    "amixer set Master 5%-"
 #define VOLUP      "amixer set Master 5%+"
 #define VOLMUTE    "amixer set Master toggle"
-#define VOLMICMUTE "amixer set Capture toggle"
-
-#define LIGHTDOWN "brightnessctl set 5%-"
-#define LIGHTUP   "brightnessctl set 5%+"
 
 #define PLAYERNEXT  "playerctl next"
 #define PLAYERPREV  "playerctl previous"
 #define PLAYERPAUSE "playerctl play-pause"
+
+#define LIGHTDOWN "brightnessctl set 5%-"
+#define LIGHTUP   "brightnessctl set 5%+"
 
 static const Key keys[] = {
 	/* modifier                  key                       function          argument */
@@ -176,15 +173,14 @@ static const Key keys[] = {
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_a,                moveresizekb,     {.v = (int []){0, 0, -40, 0}} },
 
 #define MEDIAKEYS \
-	{ 0,                         XF86XK_AudioLowerVolume,  spawn,            SHCMD(VOLDOWN) }, \
-	{ 0,                         XF86XK_AudioRaiseVolume,  spawn,            SHCMD(VOLUP) }, \
-	{ 0,                         XF86XK_AudioMute,         spawn,            SHCMD(VOLMUTE) }, \
-	{ 0,                         XF86XK_AudioMicMute,      spawn,            SHCMD(VOLMICMUTE) }, \
-	{ 0,                         XF86XK_MonBrightnessDown, spawn,            SHCMD(LIGHTDOWN) }, \
-	{ 0,                         XF86XK_MonBrightnessUp,   spawn,            SHCMD(LIGHTUP) }, \
-	{ 0,                         XF86XK_AudioNext,         spawn,            SHCMD(PLAYERNEXT) }, \
-	{ 0,                         XF86XK_AudioPrev,         spawn,            SHCMD(PLAYERPREV) }, \
-	{ 0,                         XF86XK_AudioPlay,         spawn,            SHCMD(PLAYERPAUSE) }
+	{ MODKEY,                    XKB_KEY_bracketleft,      spawn,            SHCMD(VOLDOWN) }, \
+	{ MODKEY,                    XKB_KEY_bracketright,     spawn,            SHCMD(VOLUP) }, \
+	{ MODKEY,                    XKB_KEY_backslash,        spawn,            SHCMD(VOLMUTE) }, \
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_bracketleft,      spawn,            SHCMD(PLAYERNEXT) }, \
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_bracketright,     spawn,            SHCMD(PLAYERPREV) }, \
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_backslash,        spawn,            SHCMD(PLAYERPAUSE) }, \
+	{ MODKEY,                    XKB_KEY_minus,            spawn,            SHCMD(LIGHTDOWN) }, \
+	{ MODKEY,                    XKB_KEY_equal,            spawn,            SHCMD(LIGHTUP) }
 
 	MEDIAKEYS,
 
