@@ -127,10 +127,11 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
 /* commands */
-#define TERMCMD       "foot -a term"
-#define TERMFLOATCMD  "foot -a termfloat"
-#define MENUCMD       "wmenu-desktop"
-#define SCREENSHOTCMD "grim -g \"$(slurp)\" - | wl-copy"
+#define TERMCMD          "foot -a term"
+#define TERMFLOATCMD     "foot -a termfloat"
+#define MENUCMD          "wmenu-desktop"
+#define SCREENSHOTCMD    "grim - | wl-copy"
+#define SCREENSHOTSELCMD "grim -g \"$(slurp)\" - | wl-copy"
 
 #define LOCKCMD "lock"
 
@@ -152,6 +153,7 @@ static const Key keys[] = {
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_t,                spawn,            SHCMD(TERMFLOATCMD) },
 	{ MODKEY,                    XKB_KEY_p,                spawn,            SHCMD(MENUCMD) },
 	{ MODKEY,                    XKB_KEY_o,                spawn,            SHCMD(SCREENSHOTCMD) },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_o,                spawn,            SHCMD(SCREENSHOTSELCMD) },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_x,                spawn,            SHCMD(LOCKCMD) },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_q,                killclient,       {0} },
 	{ MODKEY,                    XKB_KEY_j,                focusstack,       {.i = +1} },
