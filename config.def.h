@@ -4,6 +4,11 @@
                         ((hex >> 8) & 0xFF) / 255.0f, \
                         (hex & 0xFF) / 255.0f }
 
+/* colors */
+#define COLORBG  0x121212ff
+#define COLORFG  0xf5f6f8ff
+#define COLORRED 0xd84452ff
+
 /* appearance */
 static const int tabletmaptosurface        = 0;  /* map tablet input to surface(1) or monitor(0) */
 static const int sloppyfocus               = 1;  /* focus follows mouse */
@@ -15,15 +20,15 @@ static const unsigned int borderpx         = 1;  /* border pixel of windows */
 static const int showbar                   = 1; /* 0 means no bar */
 static const int topbar                    = 0; /* 0 means bottom bar */
 static const char *fonts[]                 = {"monospace:size=10"};
-static const float rootcolor[]             = COLOR(0x000000ff);
+static const float rootcolor[]             = COLOR(COLORBG);
 /* This conforms to the xdg-protocol. Set the alpha to zero to restore the old behavior */
-static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f}; /* You can also use glsl colors */
+static const float fullscreen_bg[]         = COLOR(COLORBG); /* You can also use glsl colors */
 static const double tablet_area[4]         = { 0.0, 0.0, 1.0, 1.0 }; /* pen active area: value 0.0 => 1.0; x, y, width, height */
 static uint32_t colors[][3]                = {
-	/*               fg          bg          border    */
-	[SchemeNorm] = { 0xffffffff, 0x000000b2, 0x000000b2},
-	[SchemeSel]  = { 0x000000b2, 0xffffffff, 0xffffffff},
-	[SchemeUrg]  = { 0xffffffff, 0xff0000b2, 0xff0000b2},
+	/*               fg       bg        border  */
+	[SchemeNorm] = { COLORFG, COLORBG,  COLORBG  },
+	[SchemeSel]  = { COLORBG, COLORFG,  COLORFG  },
+	[SchemeUrg]  = { COLORFG, COLORRED, COLORRED },
 };
 
 /* animation */
