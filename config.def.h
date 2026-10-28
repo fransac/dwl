@@ -6,6 +6,7 @@
 
 /* colors */
 #define COLORBG  0x121212ff
+#define COLORDIM 0x848485ff
 #define COLORFG  0xf5f6f8ff
 #define COLORRED 0xd84452ff
 
@@ -26,7 +27,7 @@ static const float fullscreen_bg[]         = COLOR(COLORBG); /* You can also use
 static const double tablet_area[4]         = { 0.0, 0.0, 1.0, 1.0 }; /* pen active area: value 0.0 => 1.0; x, y, width, height */
 static uint32_t colors[][3]                = {
 	/*               fg       bg        border  */
-	[SchemeNorm] = { COLORFG, COLORBG,  COLORBG  },
+	[SchemeNorm] = { COLORFG, COLORBG,  COLORDIM },
 	[SchemeSel]  = { COLORBG, COLORFG,  COLORFG  },
 	[SchemeUrg]  = { COLORFG, COLORRED, COLORRED },
 };
