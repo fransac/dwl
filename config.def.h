@@ -131,7 +131,7 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 #define TERMFLOATCMD     "foot -a termfloat"
 #define MENUCMD          "wmenu-desktop"
 #define SCREENSHOTCMD    "grim - | wl-copy"
-#define SCREENSHOTSELCMD "grim -g \"$(slurp)\" - | wl-copy"
+#define SCREENSHOTSELCMD "still -c 'slurp | grim -g - -' | wl-copy"
 
 #define LOCKCMD "lock"
 
